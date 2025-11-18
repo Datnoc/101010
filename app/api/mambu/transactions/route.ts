@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
         },
       });
 
-      let transactions = [];
+      let transactions: any[] = [];
 
       if (transactionsResponse.ok) {
         const transactionsData = await transactionsResponse.json();
