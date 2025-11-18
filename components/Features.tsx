@@ -155,9 +155,10 @@ const features = [
 
 export default function Features() {
   const { t } = useLanguage();
-  const [activeCategory, setActiveCategory] = useState(t.features.all);
+  type CategoryType = typeof t.features.all | typeof t.features.investment | typeof t.features.payment | typeof t.features.crypto;
+  const [activeCategory, setActiveCategory] = useState<CategoryType>(t.features.all);
 
-  const categories = [t.features.all, t.features.investment, t.features.payment, t.features.crypto];
+  const categories: CategoryType[] = [t.features.all, t.features.investment, t.features.payment, t.features.crypto];
 
   const filteredFeatures =
     activeCategory === t.features.all
