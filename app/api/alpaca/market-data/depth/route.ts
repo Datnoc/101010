@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
       bids = latestQuote.bp.map((price: any, index: number) => ({
         price: price?.toString() || '0',
         size: (latestQuote.bs && latestQuote.bs[index]) ? latestQuote.bs[index].toString() : '0',
-      })).filter(b => parseFloat(b.price) > 0).slice(0, 5);
+      })).filter((b: { price: string; size: string }) => parseFloat(b.price) > 0).slice(0, 5);
     } else if (latestQuote?.b && parseFloat(latestQuote.b) > 0) {
       // Tek bid değeri varsa, onu kullan ve simüle et
       const bidPrice = parseFloat(latestQuote.b);
@@ -69,14 +69,14 @@ export async function GET(request: NextRequest) {
       bids = Array.from({ length: 5 }, (_, i) => ({
         price: (bidPrice - i * 0.1).toFixed(2),
         size: (bidSize - i * 50).toString(),
-      })).filter(b => parseFloat(b.price) > 0);
+      })).filter((b: { price: string; size: string }) => parseFloat(b.price) > 0);
     }
     
     if (latestQuote?.ap && Array.isArray(latestQuote.ap) && latestQuote.ap.length > 0) {
       asks = latestQuote.ap.map((price: any, index: number) => ({
         price: price?.toString() || '0',
         size: (latestQuote.as && latestQuote.as[index]) ? latestQuote.as[index].toString() : '0',
-      })).filter(a => parseFloat(a.price) > 0).slice(0, 5);
+      })).filter((a: { price: string; size: string }) => parseFloat(a.price) > 0).slice(0, 5);
     } else if (latestQuote?.a && parseFloat(latestQuote.a) > 0) {
       // Tek ask değeri varsa, onu kullan ve simüle et
       const askPrice = parseFloat(latestQuote.a);
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
       asks = Array.from({ length: 5 }, (_, i) => ({
         price: (askPrice + i * 0.1).toFixed(2),
         size: (askSize - i * 50).toString(),
-      })).filter(a => parseFloat(a.price) > 0);
+      })).filter((a: { price: string; size: string }) => parseFloat(a.price) > 0);
     }
     
     // Eğer hala depth yoksa, quote endpoint'ini dene
@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
             bids = Array.from({ length: 5 }, (_, i) => ({
               price: (bidPrice - i * 0.1).toFixed(2),
               size: (bidSize - i * 50).toString(),
-            })).filter(b => parseFloat(b.price) > 0);
+            })).filter((b: { price: string; size: string }) => parseFloat(b.price) > 0);
           }
           
           if (quote?.ap && parseFloat(quote.ap) > 0) {
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
             asks = Array.from({ length: 5 }, (_, i) => ({
               price: (askPrice + i * 0.1).toFixed(2),
               size: (askSize - i * 50).toString(),
-            })).filter(a => parseFloat(a.price) > 0);
+            })).filter((a: { price: string; size: string }) => parseFloat(a.price) > 0);
           }
         }
       } catch (quoteError) {
@@ -135,12 +135,12 @@ export async function GET(request: NextRequest) {
         bids = Array.from({ length: 5 }, (_, i) => ({
           price: (lastPrice - (i + 1) * 0.01).toFixed(2),
           size: (baseSize - i * 100).toString(),
-        })).filter(b => parseFloat(b.price) > 0);
+        })).filter((b: { price: string; size: string }) => parseFloat(b.price) > 0);
         
         asks = Array.from({ length: 5 }, (_, i) => ({
           price: (lastPrice + (i + 1) * 0.01).toFixed(2),
           size: (baseSize - i * 100).toString(),
-        })).filter(a => parseFloat(a.price) > 0);
+        })).filter((a: { price: string; size: string }) => parseFloat(a.price) > 0);
       } else {
         // Hiç veri yoksa, başarısız döndür ama daha kullanıcı dostu mesaj
         return NextResponse.json(
