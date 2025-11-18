@@ -37,6 +37,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  let body: any = null;
+  let symbol: string | undefined;
+  
   try {
     if (!isAlpacaConfigured()) {
       return NextResponse.json(
@@ -45,7 +48,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let body;
     try {
       body = await request.json();
     } catch (parseError: any) {
@@ -58,7 +60,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { accountId, symbol, qty, side, type, time_in_force, limit_price, stop_price } = body;
+    const { accountId, symbol: symbolValue, qty, side, type, time_in_force, limit_price, stop_price } = body;
+    symbol = symbolValue;
 
     if (!accountId || !symbol || !qty || !side || !type || !time_in_force) {
       return NextResponse.json(
@@ -135,7 +138,7 @@ export async function POST(request: NextRequest) {
     // Asset not found hatası
     else if (errorMessageLower.includes('not found') || errorMessageLower.includes('asset')) {
       userFriendlyMessage = 'Bu opsiyon Alpaca\'da mevcut değil. Gösterilen opsiyonlar demo verileridir ve gerçek işlem yapılamaz. Gerçek opsiyon işlemleri için Alpaca\'dan geçerli opsiyon sembolleri kullanmanız gerekmektedir.';
-      errorMessage = `Opsiyon sembolü bulunamadı: ${symbol}. Bu sembol Alpaca sandbox ortamında mevcut değil.`;
+      errorMessage = `Opsiyon sembolü bulunamadı: ${symbol || body?.symbol || 'bilinmeyen'}. Bu sembol Alpaca sandbox ortamında mevcut değil.`;
       errorCode = 'ASSET_NOT_FOUND';
     }
     
