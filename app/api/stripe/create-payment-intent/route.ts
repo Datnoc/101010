@@ -72,19 +72,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Payment Intent oluştur
-    const paymentIntentParams: Record<string, string> = {
+    const paymentIntentParams: Record<string, string | number> = {
       amount: Math.round(amount * 100), // Stripe cent cinsinden çalışır
       currency: currency.toLowerCase(),
       payment_method_types: 'card',
-      metadata: {
-        email: email || '',
-        type: 'mambu_deposit',
-      },
+      'metadata[email]': email || '',
+      'metadata[type]': 'mambu_deposit',
     };
 
     if (customer) {
       paymentIntentParams.customer = customer;
     }
+
+    // URLSearchParams için tüm değerleri string'e çevir
+    const formParams = new URLSearchParams();
+    Object.entries(paymentIntentParams).forEach(([key, value]) => {
+      formParams.append(key, String(value));
+    });
 
     const paymentIntentResponse = await fetch('https://api.stripe.com/v1/payment_intents', {
       method: 'POST',
@@ -92,7 +96,7 @@ export async function POST(request: NextRequest) {
         'Authorization': `Bearer ${STRIPE_SECRET_KEY}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams(paymentIntentParams),
+      body: formParams,
     });
 
     if (!paymentIntentResponse.ok) {
