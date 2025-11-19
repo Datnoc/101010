@@ -288,14 +288,17 @@ async function alpacaRequest(
     // JSON parse et
     try {
       return JSON.parse(text);
-    } catch (parseError) {
+    } catch (parseError: unknown) {
       // JSON parse edilemezse, DELETE işlemleri için boş obje döndür
       if (method === 'DELETE') {
         console.warn('DELETE işlemi için JSON parse hatası, boş obje döndürülüyor:', parseError);
         return {};
       }
       // Diğer method'lar için hatayı fırlat
-      throw new Error(`JSON parse hatası: ${parseError.message}`);
+      const errorMessage = parseError instanceof Error 
+        ? parseError.message 
+        : 'Bilinmeyen JSON parse hatası';
+      throw new Error(`JSON parse hatası: ${errorMessage}`);
     }
   } catch (error: any) {
     console.error('Alpaca API Error:', error);
