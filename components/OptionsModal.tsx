@@ -33,6 +33,10 @@ interface OptionData {
   theta?: number;
   vega?: number;
   underlying_price?: number;
+  qty?: number;
+  market_value?: number;
+  cost_basis?: number;
+  unrealized_pl?: number;
 }
 
 export default function OptionsModal({ isOpen, onClose, type, accountId, accountData, onSuccess, existingOptionsPositions = [] }: OptionsModalProps) {
@@ -154,7 +158,7 @@ export default function OptionsModal({ isOpen, onClose, type, accountId, account
 
       // Eğer mevcut pozisyonlar varsa, onları kullan
       if (positionsForUnderlying.length > 0) {
-        const optionsFromPositions = positionsForUnderlying.map((pos: any) => {
+        const optionsFromPositions: OptionData[] = positionsForUnderlying.flatMap((pos: any) => {
           const symbol = pos.symbol;
           const match = symbol.match(/^([A-Z]+)(\d{6})([CP])(\d+)$/);
           if (match) {
@@ -165,7 +169,7 @@ export default function OptionsModal({ isOpen, onClose, type, accountId, account
             const expirationDate = new Date(`${year}-${month}-${day}`);
             const strike = parseInt(strikeStr) / 1000;
             
-            return {
+            return [{
               symbol,
               underlying_symbol: underlyingSym,
               option_type: type === 'C' ? 'call' : 'put',
@@ -184,10 +188,10 @@ export default function OptionsModal({ isOpen, onClose, type, accountId, account
               market_value: parseFloat(pos.market_value || '0'),
               cost_basis: parseFloat(pos.cost_basis || '0'),
               unrealized_pl: parseFloat(pos.unrealized_pl || '0'),
-            };
+            }];
           }
-          return null;
-        }).filter((opt: any) => opt !== null);
+          return [];
+        });
 
         if (optionsFromPositions.length > 0) {
           setOptionsChain(optionsFromPositions);
