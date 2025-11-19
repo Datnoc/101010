@@ -111,7 +111,7 @@ interface AlpacaOrder {
  */
 async function alpacaRequest(
   endpoint: string,
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET',
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' = 'GET',
   body?: any,
   useBrokerAPI: boolean = false,
   accountId?: string // Opsiyonel: Belirli bir account ID için
