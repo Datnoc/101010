@@ -271,7 +271,32 @@ async function alpacaRequest(
       throw new Error(detailedMessage);
     }
 
-    return await response.json();
+    // Response body'yi güvenli bir şekilde parse et
+    // DELETE işlemleri ve 204 No Content için boş body olabilir
+    const text = await response.text();
+    
+    // Boş body kontrolü
+    if (!text || text.trim().length === 0) {
+      // DELETE işlemleri için boş obje döndür (başarılı kabul edilir)
+      if (method === 'DELETE' || response.status === 204) {
+        return {};
+      }
+      // Diğer method'lar için de boş obje döndür (hata olmayabilir)
+      return {};
+    }
+    
+    // JSON parse et
+    try {
+      return JSON.parse(text);
+    } catch (parseError) {
+      // JSON parse edilemezse, DELETE işlemleri için boş obje döndür
+      if (method === 'DELETE') {
+        console.warn('DELETE işlemi için JSON parse hatası, boş obje döndürülüyor:', parseError);
+        return {};
+      }
+      // Diğer method'lar için hatayı fırlat
+      throw new Error(`JSON parse hatası: ${parseError.message}`);
+    }
   } catch (error: any) {
     console.error('Alpaca API Error:', error);
     throw error;
