@@ -51,6 +51,7 @@ interface AlpacaAccount {
   pending_transfer_in?: string;
   pending_transfer_out?: string;
   real_time_snapshot?: Record<string, any>;
+  enabled_assets?: string[]; // ['us_equity', 'us_option', 'crypto']
 }
 
 interface AlpacaPosition {
